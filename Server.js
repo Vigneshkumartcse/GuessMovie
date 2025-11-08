@@ -16,6 +16,41 @@ const CricketSchema  = mongoose.Schema({
     name: String,
     clue: [String]
 })
+
+const GuessQuestionSchema  = mongoose.Schema({
+    name: String,
+    Question:String,
+    Answer:String,
+    img:String
+})
+
+const GuessQuestion = mongoose.model("GuessQuestion", GuessQuestionSchema);
+
+
+app.post("/Questions", async (req, res) => {
+    try {
+        const { name, Question, Answer, img } = req.body;
+        const question = new GuessQuestion({ name, Question, Answer, img });
+        await question.save();
+        res.status(201).json(question);
+    } catch (error) {
+        console.error("Error creating question:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+
+app.get("/Questions", async (req, res) => {
+    try {
+        const questions = await GuessQuestion.find();
+        res.status(200).json(questions);
+    } catch (error) {
+        console.error("Error fetching questions:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+
 const Cricket = mongoose.model("Cricket", CricketSchema);
 mongoose.connect(MONGO_URI).then(() => {
     console.log("MongoDB connected");
