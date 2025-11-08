@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const app = express();
 app.use(express.json());
-const PORT =  3331;
+const PORT = process.env.PORT || 3331;
 const MONGO_URI = "mongodb+srv://movies:kumar2002@cluster0.hne66h1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 const MovieSchema  = mongoose.Schema({
     name: String,
