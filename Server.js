@@ -21,18 +21,88 @@ const CricketSchema  = mongoose.Schema({
 
 const GuessQuestionSchema  = mongoose.Schema({
     name: String,
-    Question:String,
+    Title:String,
+    Explanation:String,
     Answer:String,
     img:String
 })
 
+
+const DetectiveSchema  = mongoose.Schema({
+    Question:String,
+    peopleInvolved:[String],
+    Questionasked:[String],
+    clues:[String],
+    Options:[String],
+    Answer:String
+})
+
+
+const SongsSchema  = mongoose.Schema({
+    name: String,
+    clue: [String]
+})
+const Songs = mongoose.model("Songs", SongsSchema);
+
+
+const Detective = mongoose.model("Detective", DetectiveSchema);
+
+
+
 const GuessQuestion = mongoose.model("GuessQuestion", GuessQuestionSchema);
+
+
+app.post("/songs", async (req, res) => {
+    try {
+        const { name, clue } = req.body;
+        const song = new Songs({ name, clue });
+        await song.save();
+        res.status(201).json(song);
+    } catch (error) {
+        console.error("Error creating song:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+app.get("/songs", async (req, res) => {
+    try {
+        const songs = await Songs.find();
+        res.status(200).json(songs);
+    } catch (error) {
+        console.error("Error fetching songs:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+app.post("/Detective", async (req, res) => {
+    try {
+        const { Question, peopleInvolved, Questionasked, clues, Options, Answer } = req.body;
+        const detective = new Detective({ Question, peopleInvolved, Questionasked, clues, Options, Answer });
+        await detective.save();
+        res.status(201).json(detective);
+    } catch (error) {
+        console.error("Error creating detective question:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+
+app.get("/Detective", async (req, res) => {
+    try {
+        const detectives = await Detective.find();
+        res.status(200).json(detectives);
+    }
+    catch (error) {
+        console.error("Error fetching detective questions:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 
 app.post("/Questions", async (req, res) => {
     try {
-        const { name, Question, Answer, img } = req.body;
-        const question = new GuessQuestion({ name, Question, Answer, img });
+        const { name, Title, Explanation, Answer, img } = req.body;
+        const question = new GuessQuestion({ name, Title, Explanation, Answer, img });
         await question.save();
         res.status(201).json(question);
     } catch (error) {
