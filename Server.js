@@ -45,11 +45,68 @@ const SongsSchema  = mongoose.Schema({
 const Songs = mongoose.model("Songs", SongsSchema);
 
 
+
+const CountryByCapitalSchema  = mongoose.Schema({
+    name: String,
+    catagory:String,
+    clue: [String],
+    Answer:String
+})
+const CountryByCapital = mongoose.model("CountryByCapital", CountryByCapitalSchema);  
+
+
 const Detective = mongoose.model("Detective", DetectiveSchema);
 
 
 
 const GuessQuestion = mongoose.model("GuessQuestion", GuessQuestionSchema);
+
+
+app.get("/CountryByCapital", async (req, res) => {
+    try {
+        const countryByCapitals = await CountryByCapital.find();    
+        res.status(200).json(countryByCapitals);
+    } catch (error) {
+        console.error("Error fetching CountryByCapital:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+app.post("/CountryByCapital", async (req, res) => {
+    try {
+        const { name, catagory, clue, Answer } = req.body;  
+        const countryByCapital = new CountryByCapital({ name, catagory, clue, Answer });
+        await countryByCapital.save();
+        res.status(201).json(countryByCapital);
+    }
+    catch (error) {
+        console.error("Error creating CountryByCapital:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+app.post("/countrybycapital/Bulk", async (req, res) => {
+    try {
+        const countryByCapitalsData = req.body;
+        const countryByCapitals = await CountryByCapital.insertMany(countryByCapitalsData);
+        res.status(201).json(countryByCapitals);
+    } catch (error) {
+        console.error("Error creating CountryByCapital in bulk:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+
+app.get("/countrybycapital/:catagory", async (req, res) => {
+    try {
+        const { catagory } = req.params;
+        const countryByCapitals = await CountryByCapital.find({ catagory });
+        res.status(200).json(countryByCapitals);
+    } catch (error) {
+        console.error("Error fetching CountryByCapital by category:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 
 app.post("/songs", async (req, res) => {
@@ -97,6 +154,9 @@ app.get("/Detective", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
+
+
 
 
 app.post("/Questions", async (req, res) => {
