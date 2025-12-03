@@ -62,6 +62,84 @@ const Detective = mongoose.model("Detective", DetectiveSchema);
 const GuessQuestion = mongoose.model("GuessQuestion", GuessQuestionSchema);
 
 
+const GKschema  = mongoose.Schema({
+    question: String,
+    category:String,
+    region:String,
+    clues: [String],
+    answer:String
+})
+
+const GK = mongoose.model("GK", GKschema);
+
+app.post("/GK", async (req, res) => {
+    try {
+        const { question, category, region, clues, answer } = req.body;
+        const gk = new GK({ question, category, region, clues, answer });
+        await gk.save();
+        res.status(201).json(gk);
+    } catch (error) {
+        console.error("Error creating GK question:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+app.post("/GK/Bulk", async (req, res) => {
+    try {
+        const gkData = req.body;
+        const gkQuestions = await GK.insertMany(gkData);
+        res.status(201).json(gkQuestions);
+    } catch (error) {
+        console.error("Error creating GK questions in bulk:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+
+
+app.get("/GK", async (req, res) => {
+    try {
+        const gkQuestions = await GK.find();
+        res.status(200).json(gkQuestions);
+    } catch (error) {
+        console.error("Error fetching GK questions:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+
+app.get("/GK/:category/:region", async (req, res) => {
+    try {
+        const { category, region } = req.params;
+        const gkQuestions = await GK.find({ category, region });
+        res.status(200).json(gkQuestions);
+    } catch (error) {
+        console.error("Error fetching GK questions by category:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+
+//allow multiple categories (comma-separated)
+app.get("/GK/:category/:region", async (req, res) => {
+    try {   
+        const { category, region } = req.params;
+        // Split by comma to handle multiple categories
+        const categories = category.split(',').map(cat => cat.trim());
+        // Use $in operator to find documents matching any of the categories
+        const gkQuestions = await GK.find({ category: { $in: categories }, region });
+        res.status(200).json(gkQuestions);
+    }
+    catch (error) {
+        console.error("Error fetching GK questions by category:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+
+
+
+
 app.get("/CountryByCapital", async (req, res) => {
     try {
         const countryByCapitals = await CountryByCapital.find();    
