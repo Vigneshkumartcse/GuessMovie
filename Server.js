@@ -108,7 +108,7 @@ app.get("/GK", async (req, res) => {
 });
 
 
-app.get("/GK/:category/:region", async (req, res) => {
+app.get("/GKSingle/:category/:region", async (req, res) => {
     try {
         const { category, region } = req.params;
         const gkQuestions = await GK.find({ category, region });
