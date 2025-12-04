@@ -2,7 +2,20 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const app = express();
-app.use(cors());
+
+// CORS configuration to allow multiple origins
+const corsOptions = {
+    origin: [
+        'https://breaktimebrainpuzz.in',
+        'https://www.breaktimebrainpuzz.in',
+        'http://localhost:3000',
+        'http://localhost:5173'
+    ],
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 const PORT = process.env.PORT || 3331;
 const MONGO_URI = "mongodb+srv://movies:kumar2002@cluster0.hne66h1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
@@ -119,6 +132,16 @@ app.get("/GKSingle/:category/:region", async (req, res) => {
     }
 });
 
+
+app.delete("/GK/:category/:region", async (req, res) => {
+    try {
+        await GK.deleteMany({});
+        res.status(200).json({ message: "All GK questions deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting GK questions:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 //allow multiple categories (comma-separated)
 app.get("/GK/:category/:region", async (req, res) => {
